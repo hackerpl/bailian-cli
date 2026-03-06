@@ -5,13 +5,20 @@
 import type { BailianConfig } from './types.js';
 
 /**
- * 根据区域获取百炼 API 基础 URL
+ * 根据区域获取百炼 API 根地址
+ */
+export function getApiRoot(region: string): string {
+    if (region === 'singapore') {
+        return 'https://dashscope-intl.aliyuncs.com/api/v1';
+    }
+    return 'https://dashscope.aliyuncs.com/api/v1';
+}
+
+/**
+ * 根据区域获取百炼 AIGC 服务基础 URL
  */
 export function getBaseUrl(region: string): string {
-    if (region === 'singapore') {
-        return 'https://dashscope-intl.aliyuncs.com/api/v1/services/aigc';
-    }
-    return 'https://dashscope.aliyuncs.com/api/v1/services/aigc';
+    return `${getApiRoot(region)}/services/aigc`;
 }
 
 /**

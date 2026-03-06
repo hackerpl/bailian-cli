@@ -1,10 +1,11 @@
 # @hackerpl/bailian-cli
 
-阿里云百炼服务命令行工具，支持 TTS（文本转语音）等多种 AI 服务。
+阿里云百炼服务命令行工具，支持 TTS（文本转语音）、Image（文生图）等多种 AI 服务。
 
 ## ✨ 特性
 
 - 🎙️ **TTS（文本转语音）** — 支持 24 种音色、10 种语言，可自定义语音风格
+- 🖼️ **Image（文生图）** — 支持提示词生成图片并自动下载到本地
 - 🧩 **可扩展架构** — 模块化设计，轻松接入 ASR 等更多百炼服务
 - 🎨 **友好的终端体验** — 彩色输出、加载动画、格式化结果展示
 
@@ -170,6 +171,69 @@ bailian tts --list-voices
 
 > 也可使用 `bailian tts --list-voices` 在终端查看。
 
+---
+
+### `image` — 文生图
+
+根据提示词生成图片，并支持附带 1-3 张输入图进行生成或编辑，结果会自动下载到本地。
+
+```bash
+bailian image [选项]
+```
+
+#### 选项
+
+| 选项 | 说明 | 默认值 |
+|------|------|--------|
+| `-p, --prompt <prompt>` | 图片提示词（**必填**） | — |
+| `-i, --image <image>` | 输入图片路径/目录/HTTP(S) URL/Data URL，可重复传入，最多展开为 3 张 | — |
+| `-m, --model <model>` | 模型名称 | `qwen-image-2.0-pro` |
+| `-s, --size <size>` | 图片尺寸，例如 `1024*1024`、`1280*720` | `1280*1280` |
+| `-n, --max-images <count>` | 生成图片数量上限（1-6） | `1` |
+| `-N, --negative-prompt <prompt>` | 负向提示词 | — |
+| `-d, --output-dir <dir>` | 自定义图片输出目录 | `~/.bailian-cli/media/` |
+| `--seed <seed>` | 随机种子 | — |
+| `--no-prompt-extend` | 关闭提示词智能改写 | 默认开启 |
+| `--watermark` | 为生成图片添加水印 | `false` |
+
+#### 示例
+
+```bash
+# 基础使用
+bailian image -p "一只戴着宇航头盔的橘猫，电影海报风格，细节丰富"
+
+# 输入一张本地图进行编辑
+bailian image -p "把这只猫改成水彩插画风格" -i "./cat.png"
+
+# 输入多张图进行融合
+bailian image -p "图1中的女生穿着图2中的黑色裙子按图3的姿势坐下" -i "./girl.png" -i "./dress.png" -i "./pose.png"
+
+# 传入目录，按文件名顺序展开目录中的图片
+bailian image -p "把这组三视图整合成一张角色设定图" -i "./reference-images"
+
+# 指定尺寸和生成数量
+bailian image -p "赛博朋克城市夜景，霓虹灯，雨夜，广角镜头" -s "1024*1024" -n 2
+
+# 增加负向提示词
+bailian image -p "极简风客厅，原木色，阳光穿过落地窗" -N "低清晰度，模糊，畸形"
+
+# 指定模型、输出目录和种子
+bailian image -p "中国山水画风格的雪山与松林" -m "qwen-image-2.0-pro" -d "./output" --seed 42
+
+# 关闭提示词智能改写
+bailian image -p "极简海报，一只白色海鸥飞过蓝色海面" --no-prompt-extend
+```
+
+#### 当前限制
+
+- 当前仅支持 `qwen-image-2.0` 系列模型
+- 输入图片最多 3 张
+- `--image` 传入本地目录时，会按文件名顺序展开目录中的直接子图片文件
+- 支持输入图片格式：`JPG`、`JPEG`、`PNG`、`BMP`、`TIFF`、`WEBP`、`GIF`
+- 单张输入图片大小不能超过 `10MB`
+- 输入图片宽高都必须在 `384` 到 `3072` 像素之间
+- `oss://` 输入当前不支持，因为 CLI 无法在发送前完成本地格式和像素校验
+
 ## 📁 项目结构
 
 ```
@@ -180,8 +244,11 @@ bailian-cli/
 │   ├── cli/                    # CLI 入口与命令
 │   │   ├── index.ts            # 主入口
 │   │   └── commands/
+│   │       ├── image.ts        # Image 子命令
 │   │       └── tts.ts          # TTS 子命令
 │   ├── services/               # 服务层（按服务拆分）
+│   │   ├── image/
+│   │   │   └── index.ts        # Image 核心逻辑
 │   │   └── tts/
 │   │       ├── index.ts        # TTS 核心逻辑
 │   │       └── voices.ts       # 音色数据
@@ -218,6 +285,7 @@ npm run build
 
 # 直接运行（开发调试）
 node dist/cli/index.js tts -t "测试"
+node dist/cli/index.js image -p "一只会发光的水母漂浮在深海"
 ```
 
 ## 📄 License

@@ -48,10 +48,18 @@ export interface BailianTTSConfig {
     defaultLanguage?: BailianLanguage;
 }
 
+export interface BailianImageConfig {
+    defaultModel?: string;
+    defaultSize?: string;
+    defaultImageCount?: number;
+    defaultPromptExtend?: boolean;
+}
+
 export interface BailianConfig {
     apiKey: string;
     region?: 'beijing' | 'singapore';
     tts?: BailianTTSConfig;
+    image?: BailianImageConfig;
 }
 
 export interface TTSInput {
@@ -92,4 +100,63 @@ export interface TTSResponse {
 export interface DownloadResult {
     localPath: string;
     originalUrl: string;
+}
+
+export interface ImageGenerationInput {
+    prompt: string;
+    images?: string[];
+    model?: string;
+    size?: string;
+    n?: number;
+    negative_prompt?: string;
+    prompt_extend?: boolean;
+    watermark?: boolean;
+    seed?: number;
+}
+
+export interface ImageGenerationRequest {
+    model: string;
+    input: {
+        messages: Array<{
+            role: 'user';
+            content: Array<{
+                text?: string;
+                image?: string;
+            }>;
+        }>;
+    };
+    parameters: {
+        n: number;
+        size?: string;
+        negative_prompt?: string;
+        prompt_extend?: boolean;
+        watermark?: boolean;
+        seed?: number;
+    };
+}
+
+export interface ImageGenerationContentItem {
+    type?: string;
+    text?: string;
+    image?: string;
+}
+
+export interface ImageGenerationResponse {
+    request_id: string;
+    output: {
+        choices?: Array<{
+            finish_reason?: string;
+            message?: {
+                role?: string;
+                content?: ImageGenerationContentItem[];
+            };
+        }>;
+    };
+    usage?: {
+        image_count?: number;
+        width?: number;
+        height?: number;
+    };
+    code?: string;
+    message?: string;
 }

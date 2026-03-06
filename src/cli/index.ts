@@ -6,6 +6,7 @@
 
 import { Command } from 'commander';
 import { registerTtsCommand } from './commands/tts.js';
+import { registerImageCommand } from './commands/image.js';
 
 const program = new Command();
 
@@ -18,6 +19,7 @@ program
 
 // 注册子命令
 registerTtsCommand(program);
+registerImageCommand(program);
 
 // 未来可以在这里注册其他子命令
 // registerAsrCommand(program);
