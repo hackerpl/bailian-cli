@@ -1,6 +1,6 @@
 {
     "name": "@hackerpl/bailian-cli",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "阿里云百炼服务 CLI 工具，支持 TTS 等多种服务",
     "type": "module",
     "main": "dist/cli/index.js",
