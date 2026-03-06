@@ -13,7 +13,7 @@ const program = new Command();
 program
     .name('bailian')
     .description('阿里云百炼服务 CLI 工具')
-    .version('1.0.0')
+    .version('1.0.3')
     .option('--api-key <key>', '百炼 API Key（也可通过环境变量 BAILIAN_API_KEY 设置）')
     .option('--region <region>', 'API 区域：beijing | singapore', 'beijing');
 

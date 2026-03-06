@@ -1,6 +1,6 @@
 {
     "name": "@hackerpl/bailian-cli",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "阿里云百炼服务 CLI 工具，支持 TTS 等多种服务",
     "type": "module",
     "main": "dist/cli/index.js",
@@ -14,15 +14,23 @@
     },
     "keywords": [
         "bailian",
-        "tts",
         "aliyun",
         "cli",
-        "text-to-speech"
+        "tts",
+        "text-to-speech",
+        "image",
+        "image-generation",
+        "text-to-image",
+        "ai",
+        "llm",
+        "qwen",
+        "dashscope"
     ],
     "author": "Hackerpl <hackerpl@gmail.com>",
     "license": "MIT",
     "files": [
-        "dist"
+        "dist",
+        "LICENSE"
     ],
     "publishConfig": {
         "access": "public"
