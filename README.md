@@ -10,10 +10,18 @@
 
 ## 📦 安装
 
+### 推荐安装（全局安装）
+
+```bash
+npm i -g @hackerpl/bailian-cli
+```
+
+### 手动安装（从源码构建）
+
 ```bash
 # 克隆项目
-git clone https://github.com/hackerpl/openclaw-bailian.git
-cd openclaw-bailian/bailian-cli
+git clone https://github.com/hackerpl/bailian-cli.git
+cd bailian-cli
 
 # 安装依赖
 npm install
