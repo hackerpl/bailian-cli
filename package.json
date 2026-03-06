@@ -1,0 +1,33 @@
+{
+    "name": "@hackerpl/bailian-cli",
+    "version": "1.0.0",
+    "description": "阿里云百炼服务 CLI 工具，支持 TTS 等多种服务",
+    "type": "module",
+    "main": "dist/cli/index.js",
+    "bin": {
+        "bailian": "dist/cli/index.js"
+    },
+    "scripts": {
+        "build": "tsc",
+        "dev": "tsc --watch",
+        "start": "node dist/cli/index.js"
+    },
+    "keywords": [
+        "bailian",
+        "tts",
+        "aliyun",
+        "cli",
+        "text-to-speech"
+    ],
+    "author": "Hackerpl <hackerpl@gmail.com>",
+    "license": "MIT",
+    "dependencies": {
+        "chalk": "^5.4.1",
+        "commander": "^13.1.0",
+        "ora": "^8.2.0"
+    },
+    "devDependencies": {
+        "@types/node": "^22.13.10",
+        "typescript": "^5.8.2"
+    }
+}
