@@ -21,6 +21,12 @@
     ],
     "author": "Hackerpl <hackerpl@gmail.com>",
     "license": "MIT",
+    "files": [
+        "dist"
+    ],
+    "publishConfig": {
+        "access": "public"
+    },
     "dependencies": {
         "chalk": "^5.4.1",
         "commander": "^13.1.0",
