@@ -23,6 +23,7 @@ export function registerTtsCommand(program: Command): void {
         .option('-i, --instructions <instructions>', '语言风格指令，例如："用温柔缓慢的语调"')
         .option('-o, --output <format>', '输出格式：url（下载到本地） | data（返回 base64）', 'url')
         .option('-d, --output-dir <dir>', '自定义音频输出目录（仅在 output=url 时有效）')
+        .option('-f, --audio-format <format>', '本地音频格式：wav | mp3（仅在 output=url 时有效）', 'wav')
         .option('--optimize', '优化指令以提升语音表现力', false)
         .option('--list-voices', '列出所有可用音色')
         .action(async (options) => {
@@ -35,6 +36,11 @@ export function registerTtsCommand(program: Command): void {
             // 手动校验 text 参数
             if (!options.text) {
                 console.error(chalk.red('错误: 必须提供 -t/--text 参数'));
+                process.exit(1);
+            }
+
+            if (!['wav', 'mp3'].includes(options.audioFormat)) {
+                console.error(chalk.red('错误: --audio-format 仅支持 wav 或 mp3'));
                 process.exit(1);
             }
 
@@ -62,6 +68,7 @@ export function registerTtsCommand(program: Command): void {
                     },
                     options.output,
                     options.outputDir,
+                    options.audioFormat,
                 );
 
                 spinner.stop();

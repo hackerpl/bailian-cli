@@ -5,6 +5,7 @@
 import os from 'os';
 import fs from 'fs';
 import path from 'path';
+import { spawn } from 'child_process';
 
 import type { BailianConfig, TTSInput, DownloadResult, TTSResponse, TTSRequest } from '../../core/types.js';
 import { getBaseUrl } from '../../core/config.js';
@@ -33,25 +34,77 @@ async function downloadAudio(audioUrl: string): Promise<Buffer> {
     return Buffer.from(await audioResponse.arrayBuffer());
 }
 
+function convertWavToMp3(wavPath: string, mp3Path: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        const ffmpeg = spawn('ffmpeg', [
+            '-y',
+            '-i',
+            wavPath,
+            '-codec:a',
+            'libmp3lame',
+            '-q:a',
+            '2',
+            mp3Path,
+        ]);
+
+        let stderr = '';
+
+        ffmpeg.stderr.on('data', (chunk) => {
+            stderr += chunk.toString();
+        });
+
+        ffmpeg.on('error', (error) => {
+            if ((error as NodeJS.ErrnoException).code === 'ENOENT') {
+                reject(new Error('未找到 ffmpeg。使用 mp3 输出前，请先在本机安装 ffmpeg，或改用默认的 wav 格式。'));
+                return;
+            }
+            reject(new Error(`调用 ffmpeg 失败: ${error.message}`));
+        });
+
+        ffmpeg.on('close', (code) => {
+            if (code === 0) {
+                resolve();
+                return;
+            }
+            reject(new Error(`ffmpeg 转码失败: ${stderr.trim() || `退出码 ${code}`}`));
+        });
+    });
+}
+
 /**
  * 下载音频文件到本地
  */
-async function downloadAndSaveAudio(audioUrl: string, outputDir?: string): Promise<DownloadResult> {
+async function downloadAndSaveAudio(
+    audioUrl: string,
+    outputDir?: string,
+    audioFormat: 'wav' | 'mp3' = 'wav'
+): Promise<DownloadResult> {
     const audioDir = ensureAudioDir(outputDir);
     const timestamp = Date.now();
     const wavPath = path.join(audioDir, `${timestamp}.wav`);
+    const targetPath = audioFormat === 'mp3'
+        ? path.join(audioDir, `${timestamp}.mp3`)
+        : wavPath;
 
     try {
         const audioBuffer = await downloadAudio(audioUrl);
         fs.writeFileSync(wavPath, audioBuffer);
 
+        if (audioFormat === 'mp3') {
+            await convertWavToMp3(wavPath, targetPath);
+            fs.unlinkSync(wavPath);
+        }
+
         return {
-            localPath: wavPath,
+            localPath: targetPath,
             originalUrl: audioUrl,
         };
     } catch (error: any) {
         if (fs.existsSync(wavPath)) {
             fs.unlinkSync(wavPath);
+        }
+        if (targetPath !== wavPath && fs.existsSync(targetPath)) {
+            fs.unlinkSync(targetPath);
         }
         throw new Error(`保存音频失败: ${error.message}`);
     }
@@ -134,7 +187,8 @@ export async function textToSpeech(
     config: BailianConfig,
     input: TTSInput,
     outputFormat: 'url' | 'data' = 'url',
-    outputDir?: string
+    outputDir?: string,
+    audioFormat: 'wav' | 'mp3' = 'wav'
 ): Promise<{ success: boolean;[key: string]: any }> {
     // 验证文本长度
     if (input.text && input.text.length > 600) {
@@ -149,7 +203,7 @@ export async function textToSpeech(
     const result = await callBailianTTS(config, input);
 
     if (outputFormat === 'url') {
-        const { localPath, originalUrl } = await downloadAndSaveAudio(result.output.audio.url, outputDir);
+        const { localPath, originalUrl } = await downloadAndSaveAudio(result.output.audio.url, outputDir, audioFormat);
 
         return {
             success: true,

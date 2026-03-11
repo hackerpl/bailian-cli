@@ -11,6 +11,12 @@
 
 ## 📦 安装
 
+### 前置依赖
+
+如果你需要使用 `bailian tts -f mp3` 输出 mp3，必须先在本机安装 `ffmpeg`，因为 CLI 会调用系统里的 `ffmpeg` 可执行文件完成转码。
+
+如果只使用默认的 `wav` 输出，则不需要安装 `ffmpeg`。
+
 ### 推荐安装（全局安装）
 
 ```bash
@@ -46,6 +52,19 @@ set BAILIAN_API_KEY=sk-xxxxxxxxxxxxxxxx
 
 # Linux / macOS
 export BAILIAN_API_KEY=sk-xxxxxxxxxxxxxxxx
+```
+
+### 安装 ffmpeg（仅 mp3 输出需要）
+
+```bash
+# macOS
+brew install ffmpeg
+
+# Ubuntu / Debian
+sudo apt install ffmpeg
+
+# Windows（scoop）
+scoop install ffmpeg
 ```
 
 ### 方式二：命令行参数
@@ -96,6 +115,7 @@ bailian tts [选项]
 | `-i, --instructions <inst>` | 语音风格指令 | — |
 | `-o, --output <format>` | 输出格式：`url`（下载到本地）\| `data`（返回 base64） | `url` |
 | `-d, --output-dir <dir>` | 自定义音频输出目录（仅 `url` 模式有效） | `~/.bailian-cli/media/` |
+| `-f, --audio-format <format>` | 本地音频格式：`wav` \| `mp3`（仅 `url` 模式有效） | `wav` |
 | `--optimize` | 优化指令以提升语音表现力 | `false` |
 | `--list-voices` | 列出所有可用音色 | — |
 
@@ -120,9 +140,14 @@ bailian tts -t "测试" -o data
 # 自定义音频输出目录
 bailian tts -t "你好世界" -d "D:\audio\output"
 
+# 下载后自动转为 mp3
+bailian tts -t "你好世界" -f mp3
+
 # 查看所有可用音色
 bailian tts --list-voices
 ```
+
+> `-f mp3` 依赖本机已安装 `ffmpeg`，CLI 会先下载 wav，再自动转码为 mp3。
 
 #### 支持的语言
 
